@@ -5,8 +5,8 @@ import com.github.twitch4j.common.exception.UnauthorizedException;
 import com.github.twitch4j.helix.domain.*;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -22,7 +22,7 @@ public class TwitchInfo {
     String OAuthToken="0nqt5pcpj5j6lx849x711yblnfgrj4";
 
     TwitchOAuth twitchOAuth=new TwitchOAuth(ClientID, ClientSecret, RedirectionURL);
-    int limit=100;
+    int limit=10;
 
     StreamList topStreamList;
     ArrayList<String> streamerName=new ArrayList<>();
@@ -48,12 +48,12 @@ public class TwitchInfo {
 
         getName();
         getViewerList();
-//        getRelation();
+        getRelation();
     }
 
     private void getName() {
         topStreamList.getStreams().forEach(stream -> streamerName.add(stream.getUserName()));
-        topStreamList.getStreams().forEach(stream->System.out.println(stream.getUserLogin()));
+//        topStreamList.getStreams().forEach(stream->System.out.println(stream.getUserLogin()));
     }
 
     private void getViewerList() throws IOException {
@@ -65,12 +65,15 @@ public class TwitchInfo {
             URL url = new URL(urlstr);
             JSONObject json = new JSONObject(IOUtils.toString(url, StandardCharsets.UTF_8));
 
+            Set<String> nowArray=new TreeSet<>();
             try {
                 JSONArray array=new JSONArray(json.getJSONObject("chatters").getJSONArray("viewers"));
                 for (int i=0; i<array.length(); i++) {
-                    viewerList.add(Collections.singleton(array.getString(i)));
-                    System.out.println(array.getString(i));
+                    nowArray.add(array.getString(i));
+                    userList.add(array.getString(i));
+//                    System.out.println(array.getString(i));
                 }
+                viewerList.add(nowArray);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -81,18 +84,17 @@ public class TwitchInfo {
         for (String userName:userList) {
             UserList thisUserList= twitchClient.getHelix().getUsers(OAuthToken, null, List.of(userName)).execute();
             User thisUser=thisUserList.getUsers().get(0);
-
-            System.out.println("userName : " + userName + " userId : " + thisUser.getId() + " trying");
+            System.out.println("user " + thisUser.getDisplayName() + " userName : " + userName + " userId : " + thisUser.getId() + " trying");
 
             FollowList thisUserFollowList=twitchClient.getHelix().getFollowers(OAuthToken, thisUser.getId(), null, null, 100).execute();
             HelixPagination page=thisUserFollowList.getPagination();
             ArrayList<String> thisUserfollowingList=new ArrayList<>();
             thisUserFollowList.getFollows().forEach(user->thisUserfollowingList.add(user.getToId()));
-            thisUserFollowList.getFollows().forEach(user->System.out.println(user.getToName()));
+//            thisUserFollowList.getFollows().forEach(user->System.out.println(user.getToName()));
             assert(page!=null);
             do {
                 thisUserFollowList=twitchClient.getHelix().getFollowers(OAuthToken, thisUser.getId(), null, page.getCursor(), 100).execute();
-                thisUserFollowList.getFollows().forEach(user->thisUserfollowingList.add(user.getToId()));
+//                thisUserFollowList.getFollows().forEach(user->thisUserfollowingList.add(user.getToId()));
             } while ((page=thisUserFollowList.getPagination())!=null);
 
             System.out.println("user "+userName+"is folloinwg " + thisUserfollowingList.size() + " streamers");
