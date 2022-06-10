@@ -22,7 +22,7 @@ public class TwitchInfo {
     String OAuthToken="0nqt5pcpj5j6lx849x711yblnfgrj4";
 
     TwitchOAuth twitchOAuth=new TwitchOAuth(ClientID, ClientSecret, RedirectionURL);
-    int limit=10;
+    int limit=50;
 
     StreamList topStreamList;
     ArrayList<String> streamerName=new ArrayList<>();
@@ -73,6 +73,7 @@ public class TwitchInfo {
                     userList.add(array.getString(i));
 //                    System.out.println(array.getString(i));
                 }
+                System.out.println(array.length());
                 viewerList.add(nowArray);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -81,29 +82,49 @@ public class TwitchInfo {
     }
 
     private void getRelation() {
-        for (String userName:userList) {
-            UserList thisUserList= twitchClient.getHelix().getUsers(OAuthToken, null, List.of(userName)).execute();
-            User thisUser=thisUserList.getUsers().get(0);
-            System.out.println("user " + thisUser.getDisplayName() + " userName : " + userName + " userId : " + thisUser.getId() + " trying");
+//        int num=0;
+//        for (String userName:userList) {
+//            num++;
+//            if (num>1000) break;
+//            UserList forThisUserId= twitchClient.getHelix().getUsers(OAuthToken, null, List.of(userName)).execute();
+//            User thisUser=forThisUserId.getUsers().get(0);
+//            String thisUserId=thisUser.getId();
+//            System.out.println("user : " + thisUser.getDisplayName() + ", userName : " + userName + ", userId : " + thisUserId + " trying");
+//
+//            ArrayList<String> thisUserFollowingList=new ArrayList<>();
+//
+//            FollowList thisUserFollowingListPage=twitchClient.getHelix().getFollowers(OAuthToken, thisUserId, null, null, 100).execute();
+//            HelixPagination page=new HelixPagination();
+////            page=thisUserFollowingListPage.getPagination();
+//
+//            thisUserFollowingListPage.getFollows().forEach(user->thisUserFollowingList.add(user.getToId()));
+////            thisUserFollowingListPage.getFollows().forEach(user->System.out.println(user.getToName()));
+//            int sizeMemo=0;
+//            Set<String> st=new HashSet<>();
+//            thisUserFollowingListPage.getFollows().forEach(user->st.add(user.getToName()));
+//            while ((page=thisUserFollowingListPage.getPagination())!=null) {
+//                thisUserFollowingListPage = twitchClient.getHelix().getFollowers(OAuthToken, thisUserId, null, page.getCursor(), 100).execute();
+//                thisUserFollowingListPage.getFollows().forEach(user -> thisUserFollowingList.add(user.getToId()));
+////                thisUserFollowingListPage.getFollows().forEach(user->System.out.println(user.getToName()));
+//                thisUserFollowingListPage.getFollows().forEach(user -> st.add(user.getToName()));
+////                System.out.println(st.size());
+//                if (st.size()==sizeMemo) break;
+//                sizeMemo=st.size();
+//            }
 
-            FollowList thisUserFollowList=twitchClient.getHelix().getFollowers(OAuthToken, thisUser.getId(), null, null, 100).execute();
-            HelixPagination page=thisUserFollowList.getPagination();
-            ArrayList<String> thisUserfollowingList=new ArrayList<>();
-            thisUserFollowList.getFollows().forEach(user->thisUserfollowingList.add(user.getToId()));
-//            thisUserFollowList.getFollows().forEach(user->System.out.println(user.getToName()));
-            assert(page!=null);
-            do {
-                thisUserFollowList=twitchClient.getHelix().getFollowers(OAuthToken, thisUser.getId(), null, page.getCursor(), 100).execute();
-//                thisUserFollowList.getFollows().forEach(user->thisUserfollowingList.add(user.getToId()));
-            } while ((page=thisUserFollowList.getPagination())!=null);
+//            System.out.println("user "+userName+"is folloinwg " + thisUserFollowingList.size() + " streamers");
+//        }
 
-            System.out.println("user "+userName+"is folloinwg " + thisUserfollowingList.size() + " streamers");
-        }
 
-////        for (int i=0; i<limit; i++) {
-////            for (int j=0; j<i; j++) {
-//        int i=0;
-//        int j=1;
+        int cnt=0;
+        for(int i=0; i<limit; i++) {
+            for (int j=0; j<i; j++) {
+                Set<String> mergeSet=new HashSet<>();
+                mergeSet.addAll(viewerList.get(i));
+                mergeSet.addAll(viewerList.get(j));
+                int result=viewerList.get(i).size()+viewerList.get(j).size()-mergeSet.size();
+                System.out.println("watching both streamer#"+i+" and streamer#"+j+ " : " + result);
+                if (result>30) cnt++;
 //                int iii=viewerList.get(i).size();
 //                int jjj=viewerList.get(j).size();
 //
@@ -122,9 +143,10 @@ public class TwitchInfo {
 //                    else System.out.println("not following ");
 //                }
 //                System.out.println("count between streamer#" + i + " and streamer#" + j + " is " + count[i][j] );
-////            }
-//
-////        }
-////
+            }
+
+        }
+        System.out.println(cnt);
+
     }
 }
