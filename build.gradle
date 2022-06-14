@@ -5,6 +5,7 @@ plugins {
 
 repositories {
     mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -14,4 +15,15 @@ dependencies {
     implementation 'org.danilopianini:graphstream-gs-core:2.0.0'
     implementation 'org.danilopianini:graphstream-gs-ui-swing:2.0.0'
     implementation group: 'com.github.twitch4j', name: 'twitch4j', version: '1.10.0'
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'launcher'
+    }
+    from {
+        configurations.compile.collect {
+            it.isDirectory()? it: zipTree(it)
+        }
+    }
 }

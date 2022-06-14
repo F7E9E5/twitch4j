@@ -1,3 +1,5 @@
+package twitch4jPackage;
+
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
@@ -100,14 +102,14 @@ public class TwitchInfo {
                 mergeSet.addAll(viewerList.get(i));
                 mergeSet.addAll(viewerList.get(j));
                 int result = viewerList.get(i).size() + viewerList.get(j).size() - mergeSet.size();
-                System.out.println("watching both streamer#" + i + " and streamer#" + j + " : " + result);
+//                System.out.println("watching both streamer#" + i + " and streamer#" + j + " : " + result);
                 count[i][j] = count[j][i] = result;
             }
         }
     }
 
     public URL getProfileImageURL(String userLoginName) throws MalformedURLException {
-        UserList userlist = twitchClient.getHelix().getUsers(null, null, List.of(userLoginName)).execute();
+        UserList userlist = twitchClient.getHelix().getUsers(OAuthToken, null, List.of(userLoginName)).execute();
         User user = userlist.getUsers().get(0);
         String urlStr = user.getProfileImageUrl();
         return new URL(urlStr);

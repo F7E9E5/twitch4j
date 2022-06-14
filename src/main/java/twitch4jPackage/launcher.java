@@ -1,5 +1,6 @@
+package twitch4jPackage;
+
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class launcher {
     public static void main(String[] Args) throws IOException {
