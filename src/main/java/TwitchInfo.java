@@ -5,13 +5,11 @@ import com.github.twitch4j.common.exception.UnauthorizedException;
 import com.github.twitch4j.helix.domain.*;
 
 import java.io.IOException;
-import java.net.Socket;
+import java.net.MalformedURLException;
 import java.net.SocketException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.sql.Time;
 import java.util.*;
-import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
@@ -19,42 +17,47 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class TwitchInfo {
-    private final String ClientID="nu2iy6l1zrpn95fo33fkkp7dkl0ks8";
-    private final String ClientSecret="5a5y19o9tb5k10rsfn93ae00ps19kz";
-    private final String RedirectionURL="https://twitchapps.com/tokengen/";
-    private final String OAuthToken="0nqt5pcpj5j6lx849x711yblnfgrj4";
+    private final String ClientID = "nu2iy6l1zrpn95fo33fkkp7dkl0ks8";
+    private final String ClientSecret = "5a5y19o9tb5k10rsfn93ae00ps19kz";
+    private final String RedirectionURL = "https://twitchapps.com/tokengen/";
+    private final String OAuthToken = "0nqt5pcpj5j6lx849x711yblnfgrj4";
 
-    TwitchOAuth twitchOAuth=new TwitchOAuth(ClientID, ClientSecret, RedirectionURL);
-    int limit=-1;
+    TwitchOAuth twitchOAuth = new TwitchOAuth(ClientID, ClientSecret, RedirectionURL);
+    int limit;
 
     private final StreamList topStreamList;
-    private final ArrayList<String> streamerLoginName=new ArrayList<>();
-    private final ArrayList<Set<String>> viewerList=new ArrayList<>();
+    private final ArrayList<String> streamerLoginName = new ArrayList<>();
+    private final ArrayList<Set<String>> viewerList = new ArrayList<>();
     private final TwitchClient twitchClient;
-    private final Set<String> userList=new HashSet<>();
+    private final Set<String> userList = new HashSet<>();
     private final int[][] count;
-    private final ArrayList<Integer> viewerCount=new ArrayList<>();
+    private final ArrayList<Integer> viewerCount = new ArrayList<>();
 
     public ArrayList<String> getStreamerLoginName() {
         return streamerLoginName;
     }
+
     public int[][] getStreamerRelationship() {
         return count;
     }
+
     public int getLimit() {
         return limit;
     }
-    public ArrayList<Integer> getViewerCount() { return viewerCount; }
+
+    public ArrayList<Integer> getViewerCount() {
+        return viewerCount;
+    }
 
     TwitchInfo(int limitParam) throws UnauthorizedException, IOException {
-        limit=limitParam;
-        count=new int[limit][limit];
+        limit = limitParam;
+        count = new int[limit][limit];
 
         twitchClient = TwitchClientBuilder.builder().withDefaultAuthToken(new OAuth2Credential("twitch", ClientSecret)).withEnableHelix(true).build();
-        topStreamList = twitchClient.getHelix().getStreams(OAuthToken,null, null, limit, null, Collections.singletonList("ko"), null, null).execute();
+        topStreamList = twitchClient.getHelix().getStreams(OAuthToken, null, null, limit, null, Collections.singletonList("ko"), null, null).execute();
 
         getName();
-        limit=getViewerList();
+        limit = getViewerList();
         getRelation();
     }
 
@@ -63,23 +66,22 @@ public class TwitchInfo {
     }
 
     private int getViewerList() throws IOException {
-        for (int i=0; i<limit; i++) {
-            String urlstr="http://tmi.twitch.tv/group/user/"+topStreamList.getStreams().get(i).getUserLogin()+"/chatters";
+        for (int i = 0; i < limit; i++) {
+            String urlstr = "http://tmi.twitch.tv/group/user/" + topStreamList.getStreams().get(i).getUserLogin() + "/chatters";
             URL url = new URL(urlstr);
             JSONObject json;
             try {
                 json = new JSONObject(IOUtils.toString(url, StandardCharsets.UTF_8));
-            }
-            catch (SocketException ex) {
+            } catch (SocketException ex) {
                 limit--;
                 continue;
             }
 
-            Set<String> nowArray=new TreeSet<>();
+            Set<String> nowArray = new TreeSet<>();
             try {
-                JSONArray array=new JSONArray(json.getJSONObject("chatters").getJSONArray("viewers"));
+                JSONArray array = new JSONArray(json.getJSONObject("chatters").getJSONArray("viewers"));
                 viewerCount.add(json.getInt("chatter_count"));
-                for (int j=0; j<array.length(); j++) {
+                for (int j = 0; j < array.length(); j++) {
                     nowArray.add(array.getString(j));
                     userList.add(array.getString(j));
                 }
@@ -92,15 +94,22 @@ public class TwitchInfo {
     }
 
     private void getRelation() {
-        for(int i=0; i<limit; i++) {
-            for (int j=0; j<i; j++) {
-                Set<String> mergeSet=new HashSet<>();
+        for (int i = 0; i < limit; i++) {
+            for (int j = 0; j < i; j++) {
+                Set<String> mergeSet = new HashSet<>();
                 mergeSet.addAll(viewerList.get(i));
                 mergeSet.addAll(viewerList.get(j));
-                int result=viewerList.get(i).size()+viewerList.get(j).size()-mergeSet.size();
-                System.out.println("watching both streamer#"+i+" and streamer#"+j+ " : " + result);
-                count[i][j]=count[j][i]=result;
+                int result = viewerList.get(i).size() + viewerList.get(j).size() - mergeSet.size();
+                System.out.println("watching both streamer#" + i + " and streamer#" + j + " : " + result);
+                count[i][j] = count[j][i] = result;
             }
         }
+    }
+
+    public URL getProfileImageURL(String userLoginName) throws MalformedURLException {
+        UserList userlist = twitchClient.getHelix().getUsers(null, null, List.of(userLoginName)).execute();
+        User user = userlist.getUsers().get(0);
+        String urlStr = user.getProfileImageUrl();
+        return new URL(urlStr);
     }
 }
