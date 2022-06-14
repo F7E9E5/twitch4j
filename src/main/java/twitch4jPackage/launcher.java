@@ -7,6 +7,6 @@ public class launcher {
         System.setProperty("org.graphstream.ui", "swing");
 
         int limit=10;
-        GraphMaker graphMaker=new GraphMaker(limit);
+        MyFrame myFrame=new MyFrame(limit);
     }
 }

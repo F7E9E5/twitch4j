@@ -8,8 +8,6 @@ import org.graphstream.ui.swing_viewer.SwingViewer;
 import org.graphstream.ui.swing_viewer.ViewPanel;
 import org.graphstream.ui.view.View;
 import org.graphstream.ui.view.Viewer;
-import org.graphstream.ui.view.ViewerListener;
-import org.graphstream.ui.view.ViewerPipe;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,10 +16,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class GraphMaker implements ViewerListener {
+public class GraphMaker {
     int limit;
     private float avg;
-    protected boolean loop = true;
 
     private int[][] relationCount;
     private ArrayList<Integer> viewerCount;
@@ -30,21 +27,23 @@ public class GraphMaker implements ViewerListener {
 
     TwitchInfo twitchInfo;
 
-    private final JFrame frame = new JFrame();
     private final Graph graph = new SingleGraph("twitch4j", false, true);
+    private JPanel board=new JPanel();
 
     private Node[] nodes;
     private Edge[][] edges;
 
-    GraphMaker(int limitParam) throws IOException {
+    SwingViewer viewer;
+    View view;
+    ViewPanel viewPanel;
+
+    GraphMaker(TwitchInfo twitchInfoParam, int limitParam) throws IOException {
+        this.twitchInfo=twitchInfoParam;
         init(limitParam);
+    }
 
-        frame.setVisible(true);
-        frame.setLayout(new BorderLayout());
-        frame.setPreferredSize(new Dimension(1200, 800));
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
-        SwingViewer viewer = new SwingViewer(graph, Viewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
+    public ViewPanel makeGraph() {
+        viewer = new SwingViewer(graph, Viewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
         viewer.enableAutoLayout();
         viewer.setCloseFramePolicy(Viewer.CloseFramePolicy.HIDE_ONLY);
 
@@ -53,21 +52,12 @@ public class GraphMaker implements ViewerListener {
         setAttribution();
         setEdge();
 
-        View view = viewer.addDefaultView(false);
-//
-        ViewPanel viewPanel=(ViewPanel)view;
-        viewPanel.setPreferredSize(new Dimension(900, 600));
+        view = viewer.addDefaultView(false);
 
-        frame.add(viewPanel, BorderLayout.CENTER);
-        frame.pack();
-        frame.setLocationRelativeTo(null);
+        viewPanel=(ViewPanel)view;
+        viewPanel.setPreferredSize(new Dimension(900, 800));;
 
-        ViewerPipe viewerPipe = viewer.newViewerPipe();
-        viewerPipe.addViewerListener(this);
-        viewerPipe.addSink(graph);
-        while (loop) {
-            viewerPipe.pump();
-        }
+        return viewPanel;
     }
 
     private void init(Integer limitParam) throws IOException {
@@ -100,7 +90,6 @@ public class GraphMaker implements ViewerListener {
             nodes[i].setAttribute("ui.style", "fill-mode: dyn-plain;");
             nodes[i].setAttribute("ui.style", "fill-color: rgb(100,65,165);");
         }
-//        nameToNum.forEach((a, b)->System.out.println(a + " " + b));
     }
 
     private void setEdge() {
@@ -112,36 +101,5 @@ public class GraphMaker implements ViewerListener {
                 edges[i][j].setAttribute("layout.weight", 0.001 * relationCount[i][j]);
             }
         }
-    }
-
-    @Override
-    public void viewClosed(String viewName) {
-        loop = false;
-        System.out.println("goodbye");
-    }
-
-    @Override
-    public void buttonPushed(String id) {
-        System.out.println("button pushed on " + id);
-        if (nameToNum.containsKey(id)) {
-            int num = nameToNum.get(id);
-            try {
-                ClickedNode node = new ClickedNode(twitchInfo, id, num);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @Override
-    public void buttonReleased(String id) {
-    }
-
-    @Override
-    public void mouseOver(String id) {
-    }
-
-    @Override
-    public void mouseLeft(String id) {
     }
 }
