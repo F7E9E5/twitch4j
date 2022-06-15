@@ -55,7 +55,7 @@ public class MoreInfoFrame extends JFrame {
         JLabel nameLabel= new JLabel(twitchInfo.getStreamerName().get(number));
         nameLabel.setFont(font);
         nameLabel.setHorizontalAlignment(JLabel.CENTER);
-        nameLabel.setPreferredSize(new Dimension(200, 200/3));
+        nameLabel.setPreferredSize(new Dimension(300, 200/3));
         GridBagConstraints nameLabelGbc=new GridBagConstraints();
         nameLabelGbc.gridy=0;
         nameLabelGbc.gridx=1;
@@ -68,7 +68,7 @@ public class MoreInfoFrame extends JFrame {
         loginNameLabel.setFont(font);
         loginNameLabel.setHorizontalAlignment(JLabel.CENTER);
         loginNameLabel.setVerticalAlignment(JLabel.CENTER);
-        loginNameLabel.setPreferredSize(new Dimension(200, 200/3));
+        loginNameLabel.setPreferredSize(new Dimension(300, 200/3));
         GridBagConstraints loginNameLabelGbc = new GridBagConstraints();
         loginNameLabelGbc.gridy = 1;
         loginNameLabelGbc.gridx = 1;
@@ -97,7 +97,7 @@ public class MoreInfoFrame extends JFrame {
         countLabel.setFont(font);
         countLabel.setHorizontalAlignment(JLabel.CENTER);
         countLabel.setVerticalAlignment(JLabel.CENTER);
-        countLabel.setPreferredSize(new Dimension(200, 200/3));
+        countLabel.setPreferredSize(new Dimension(300, 200/3));
         GridBagConstraints countLabelGbc = new GridBagConstraints();
         countLabelGbc.gridy = 2;
         countLabelGbc.gridx = 1;

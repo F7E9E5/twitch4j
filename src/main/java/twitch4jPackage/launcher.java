@@ -6,7 +6,7 @@ public class launcher {
     public static void main(String[] Args) throws IOException {
         System.setProperty("org.graphstream.ui", "swing");
 
-        int limit=30;
+        int limit=20;
         MyFrame myFrame=new MyFrame(limit);
     }
 }
