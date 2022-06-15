@@ -34,6 +34,7 @@ public class TwitchInfo {
     private final Set<String> userList = new HashSet<>();
     private final int[][] count;
     private final ArrayList<Integer> viewerCount = new ArrayList<>();
+    private final ArrayList<String> streamerName=new ArrayList<>();
 
     public ArrayList<String> getStreamerLoginName() {
         return streamerLoginName;
@@ -51,6 +52,10 @@ public class TwitchInfo {
         return viewerCount;
     }
 
+    public StreamList getTopStreamList() { return topStreamList; }
+
+    public ArrayList<String> getStreamerName() {return streamerName; }
+
     TwitchInfo(int limitParam) throws UnauthorizedException, IOException {
         limit = limitParam;
         count = new int[limit][limit];
@@ -65,6 +70,7 @@ public class TwitchInfo {
 
     private void getName() {
         topStreamList.getStreams().forEach(stream -> streamerLoginName.add(stream.getUserLogin()));
+        topStreamList.getStreams().forEach(stream->streamerName.add(stream.getUserName()));
     }
 
     private int getViewerList() throws IOException {
@@ -102,7 +108,6 @@ public class TwitchInfo {
                 mergeSet.addAll(viewerList.get(i));
                 mergeSet.addAll(viewerList.get(j));
                 int result = viewerList.get(i).size() + viewerList.get(j).size() - mergeSet.size();
-//                System.out.println("watching both streamer#" + i + " and streamer#" + j + " : " + result);
                 count[i][j] = count[j][i] = result;
             }
         }

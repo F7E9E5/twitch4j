@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static java.lang.Math.max;
+
 public class GraphMaker {
     int limit;
     private float avg;
@@ -55,7 +57,7 @@ public class GraphMaker {
         view = viewer.addDefaultView(false);
 
         viewPanel=(ViewPanel)view;
-        viewPanel.setPreferredSize(new Dimension(900, 800));;
+        viewPanel.setPreferredSize(new Dimension(900, 800));
 
         return viewPanel;
     }
@@ -80,13 +82,13 @@ public class GraphMaker {
         nodes = new Node[limit];
 
         for (int i = 0; i < limit; i++) {
-            nodes[i] = graph.addNode(streamerLoginName.get(i));
+            nodes[i] = graph.addNode(String.valueOf(i));
             nameToNum.put(streamerLoginName.get(i), i);
             nodes[i].setAttribute("ui.label", streamerLoginName.get(i));
-            String tmp = Float.toString((float) viewerCount.get(i) / avg * 30);
+            String tmp = Float.toString(max((float) viewerCount.get(i) / avg * 20, 20));
             nodes[i].setAttribute("ui.style", "text-size: " + tmp + ";");
             nodes[i].setAttribute("ui.style", "size-mode: dyn-size;");
-            nodes[i].setAttribute("ui.size", (float) viewerCount.get(i) / avg * 100);
+            nodes[i].setAttribute("ui.size", (float) viewerCount.get(i) / avg * 50);
             nodes[i].setAttribute("ui.style", "fill-mode: dyn-plain;");
             nodes[i].setAttribute("ui.style", "fill-color: rgb(100,65,165);");
         }
@@ -97,7 +99,7 @@ public class GraphMaker {
 
         for (int i = 0; i < limit; i++) {
             for (int j = i + 1; j < limit; j++) {
-                edges[i][j] = graph.addEdge(streamerLoginName.get(i) + streamerLoginName.get(j), nodes[i], nodes[j]);
+                edges[i][j] = graph.addEdge(String.valueOf(i)+String.valueOf(j), nodes[i], nodes[j]);
                 edges[i][j].setAttribute("layout.weight", 0.001 * relationCount[i][j]);
             }
         }
