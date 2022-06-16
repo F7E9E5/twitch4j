@@ -9,9 +9,13 @@ import org.graphstream.ui.swing_viewer.ViewPanel;
 import org.graphstream.ui.view.View;
 import org.graphstream.ui.view.Viewer;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -45,7 +49,7 @@ public class GraphMaker {
         init(limitParam);
     }
 
-    public ViewPanel makeGraph() {
+    public ViewPanel makeGraph() throws IOException {
         viewer = new SwingViewer(graph, Viewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
         viewer.enableAutoLayout();
         viewer.setCloseFramePolicy(Viewer.CloseFramePolicy.HIDE_ONLY);
@@ -79,7 +83,7 @@ public class GraphMaker {
         return (float) ret.get() / limit;
     }
 
-    private void setAttribution() {
+    private void setAttribution() throws IOException {
         nodes = new Node[limit];
 
         for (int i = 0; i < limit; i++) {
@@ -88,20 +92,27 @@ public class GraphMaker {
             nodes[i].setAttribute("ui.label", streamerLoginName.get(i));
             String tmp = Float.toString( (float)max(sqrt((float) viewerCount.get(i) / avg) * 20, 20));
             nodes[i].setAttribute("ui.style", "text-size: " + tmp + ";");
+            nodes[i].setAttribute("ui.style", "text-alignment: under;");
             nodes[i].setAttribute("ui.style", "size-mode: dyn-size;");
             nodes[i].setAttribute("ui.size", max(sqrt((float) viewerCount.get(i) / avg) * 50, 50));
-            nodes[i].setAttribute("ui.style", "fill-mode: dyn-plain;");
-            nodes[i].setAttribute("ui.style", "fill-color: rgb(100,65,165);");
+            nodes[i].setAttribute("ui.style", "fill-mode: image-scaled;");
+            URL url=twitchInfo.getProfileImageURL(twitchInfo.getStreamerLoginName().get(i));
+            nodes[i].setAttribute("ui.style", "fill-image: url('" + url + "');");
+            nodes[i].setAttribute("ui.style", "stroke-mode: plain;");
         }
     }
+    
+    
 
     private void setEdge() {
         edges = new Edge[limit][limit];
 
         for (int i = 0; i < limit; i++) {
             for (int j = i + 1; j < limit; j++) {
+            	if (relationCount[i][j] <= 50) {continue;}
                 edges[i][j] = graph.addEdge(String.valueOf(i)+String.valueOf(j), nodes[i], nodes[j]);
-                edges[i][j].setAttribute("layout.weight", 0.005 * relationCount[i][j]);
+                edges[i][j].setAttribute("ui.style", "shape: cubic-curve;");
+                edges[i][j].setAttribute("layout.weight", 0.05 * relationCount[i][j]);
             }
         }
     }
