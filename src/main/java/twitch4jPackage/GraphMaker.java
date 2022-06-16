@@ -109,10 +109,12 @@ public class GraphMaker {
 
         for (int i = 0; i < limit; i++) {
             for (int j = i + 1; j < limit; j++) {
-            	if (relationCount[i][j] <= 50) {continue;}
+            	if (relationCount[i][j] <= 30) {continue;}
                 edges[i][j] = graph.addEdge(String.valueOf(i)+String.valueOf(j), nodes[i], nodes[j]);
-                //edges[i][j].setAttribute("ui.style", "shape: cubic-curve;");
-                edges[i][j].setAttribute("layout.weight", 0.05 * relationCount[i][j]);
+                int iviewerCount= viewerCount.get(i);
+                int jviewerCount=viewerCount.get(j);
+                int temp=iviewerCount+jviewerCount-relationCount[i][j];
+                edges[i][j].setAttribute("layout.weight", temp/relationCount[i][j]);
             }
         }
     }

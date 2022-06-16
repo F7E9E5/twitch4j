@@ -15,7 +15,6 @@ public class MyFrame extends JFrame {
         GraphMaker graphMaker=new GraphMaker(twitchInfo, limit);
         BoardMaker boardMaker=new BoardMaker(twitchInfo, limit);
 
-        setVisible(true);
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(1200, 800));
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -25,5 +24,7 @@ public class MyFrame extends JFrame {
 
         pack();
         setLocationRelativeTo(null);
+
+        setVisible(true);
     }
 }
