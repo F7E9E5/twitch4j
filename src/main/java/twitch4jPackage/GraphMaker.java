@@ -111,7 +111,7 @@ public class GraphMaker {
             for (int j = i + 1; j < limit; j++) {
             	if (relationCount[i][j] <= 50) {continue;}
                 edges[i][j] = graph.addEdge(String.valueOf(i)+String.valueOf(j), nodes[i], nodes[j]);
-                edges[i][j].setAttribute("ui.style", "shape: cubic-curve;");
+                //edges[i][j].setAttribute("ui.style", "shape: cubic-curve;");
                 edges[i][j].setAttribute("layout.weight", 0.05 * relationCount[i][j]);
             }
         }
