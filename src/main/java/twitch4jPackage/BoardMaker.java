@@ -35,20 +35,27 @@ public class BoardMaker extends JScrollPane {
         setViewportView(bigPanel);
 
         Font font=new Font(null, Font.BOLD, 20);
+        //bigPanel.setBackground(Color.yellow);
 
         for (int i=0; i<limit; i++) {
             JPanel panel=new JPanel();
             panel.setLayout(new BorderLayout());
             panel.setPreferredSize(new Dimension(270, 30));
 
-            JLabel label=new JLabel(streamerLoginName.get(i));
+            JLabel label=new JLabel(twitchInfo.getStreamerName().get(i));
             label.setPreferredSize(new Dimension(170, 30));
+            label.setForeground(Color.white);
+            
             panel.add(label, BorderLayout.CENTER);
+            panel.setBackground(new Color(142, 78, 236));
+            panel.setBorder(BorderFactory.createLineBorder(Color.black));
+            
             label.setVisible(true);
             label.setFont(font);
 
             JButton button=new JButton("More");
             button.setPreferredSize(new Dimension(100, 30));
+            button.setBackground(Color.white);
             panel.add(button, BorderLayout.EAST);
             button.setVisible(true);
             int finalI = i;
