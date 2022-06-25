@@ -19,12 +19,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class TwitchInfo {
-    private final String ClientID = "nu2iy6l1zrpn95fo33fkkp7dkl0ks8";
-    private final String ClientSecret = "5a5y19o9tb5k10rsfn93ae00ps19kz";
-    private final String RedirectionURL = "https://twitchapps.com/tokengen/";
-    private final String OAuthToken = "0nqt5pcpj5j6lx849x711yblnfgrj4";
+    private final String ClientID = "xxx";
+    private final String ClientSecret = "xxx";
+    private final String RedirectionURL = "xxx";
+    private final String OAuthToken = "xxx";
 
-    TwitchOAuth twitchOAuth = new TwitchOAuth(ClientID, ClientSecret, RedirectionURL);
     int limit;
 
     private final StreamList topStreamList;
